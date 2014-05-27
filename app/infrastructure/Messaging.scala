@@ -1,15 +1,14 @@
 package infrastructure
 
-import com.typesafe.config.ConfigFactory
-//import akka.util.duration._
-import scala.concurrent.duration._
-import play.libs.Akka
-import akka.actor.Props
-import play.api.Logger
-import com.rabbitmq.client.{Connection, ConnectionFactory, QueueingConsumer}
-import com.rabbitmq.client.Channel
 import akka.actor.Actor
+import akka.actor.Props
+import com.rabbitmq.client.Channel
+import com.rabbitmq.client.{Connection, ConnectionFactory, QueueingConsumer}
+import com.typesafe.config.ConfigFactory
+import play.api.Logger
+import play.libs.Akka
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration._
 
 object Config {
   val RABBITMQ_HOST = ConfigFactory.load().getString("rabbitmq.host")
@@ -49,12 +48,12 @@ object Sender {
 
     // create a channel for the listener and setup the first listener
     val listenChannel1 = connection.createChannel();
-    setupListener(listenChannel1,listenChannel1.queueDeclare().getQueue(),
+    setupListener(listenChannel1, listenChannel1.queueDeclare().getQueue(),
       Config.RABBITMQ_EXCHANGEE, callback3);
 
     // create another channel for a listener and setup the second listener
     val listenChannel2 = connection.createChannel();
-    setupListener(listenChannel2,listenChannel2.queueDeclare().getQueue(),
+    setupListener(listenChannel2, listenChannel2.queueDeclare().getQueue(),
       Config.RABBITMQ_EXCHANGEE, callback4);
 
     // create an actor that is invoked every two seconds after a delay of
@@ -65,7 +64,7 @@ object Sender {
       "MSG to Exchange");
   }
 
-  private def setupListener(channel: Channel, queueName : String, exchange: String, f: (String) => Any) {
+  private def setupListener(channel: Channel, queueName: String, exchange: String, f: (String) => Any) {
     channel.queueBind(queueName, exchange, "");
 
     Akka.system.scheduler.scheduleOnce(2 seconds,
